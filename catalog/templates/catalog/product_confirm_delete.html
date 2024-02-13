@@ -1,0 +1,26 @@
+{% extends 'catalog/base.html' %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form | crispy }}
+                            <p>Вы уверены, что хотите удалить "{{object.name}}"?</p>
+                            <button type="submit" class="btn btn-danger">Удалить</button>
+                            <a href="{% url 'catalog:product_list' object.pk %}"
+                               class="btn btn-dark">Отмена</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

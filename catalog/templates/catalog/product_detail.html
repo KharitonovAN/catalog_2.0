@@ -1,0 +1,34 @@
+{% extends 'catalog/base.html' %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load mediapath %}
+
+{% block title %}{{ object.name }}{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1>{{ object.name }}</h1>
+        <p>{{ object.description }}</p>
+
+        {% if object.image %}
+            <img src="{{ object.image.url }}" alt="{{ object.name }}" class="img-fluid">
+        {% endif %}
+
+        <p>Цена: {{object.price}}</p>
+        <br>
+        <div class="buttons mt-3">
+            <a href="{% url 'catalog:edit_product' object.pk %}"
+               class="btn btn-outline-warning">Редактировать</a>
+            <a href="{% url 'catalog:product_confirm_delete' object.pk %}"
+               class="btn btn-outline-danger">Удалить</a>
+        </div>
+        <ul class="list-unstyled mt-3 mb-4">
+            <li>Версия:
+                {% if object.active_version %}
+                    {{ object.active_version }}</li>
+                {% else %}
+                    Версии нет
+                {% endif %}
+        </ul>
+    </div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'catalog/base.html' %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load mediapath %}
+
+{% block title %}Создание продукта{% endblock %}
+{% block content %}
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form | crispy }}
+
+
+                            {% for object in object_list %}
+
+                            {% endfor %}
+                            <div class="card-header">
+                                <h3 class="card-title text-center">
+                                    Версия товара
+                                </h3>
+                            </div>
+                            <br>
+                            <div class="card-body">
+                                {{formset.management_form}}
+                                {% for form in formset.forms %}
+                                {{ form|crispy }}
+                                {% endfor %}
+                            <button type="submit" class="btn btn-primary">Создать продукт</button>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

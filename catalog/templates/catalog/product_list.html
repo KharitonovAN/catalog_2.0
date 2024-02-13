@@ -1,0 +1,38 @@
+{% extends 'catalog/base.html' %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load mediapath %}
+
+{% block title %}Список продуктов{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Список продуктов</h1>
+        {% for object in object_list %}
+            <div class="product">
+                <h2>{{ object.name }}</h2>
+                <p>{{ object.description }}</p>
+                {% if object.active_version %}
+                    <p>Активная версия: {{ object.active_version }}</p>
+                {% else %}
+                    <p>Нет активной версии</p>
+                {% endif %}
+
+                <a href="{% url 'catalog:product_detail' object.pk %}"
+                   class="btn btn-outline-primary">Подробнее</a>
+                <a href="{% url 'catalog:edit_product' object.pk %}"
+                   class="btn btn-outline-warning">Редактировать</a>
+                <a href="{% url 'catalog:product_confirm_delete' object.pk %}"
+                   class="btn btn-outline-danger">Удалить</a>
+
+                {% if forloop.revcounter0 != 0  %}
+                    <hr>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <br>
+        <a href="{% url 'catalog:home' %}" class="btn btn-primary mt-3">Вернуться на главную</a>
+    </div>
+{% endblock %}
