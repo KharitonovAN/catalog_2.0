@@ -42,11 +42,12 @@ INSTALLED_APPS = [
     'blogpost',
     'crispy_forms',
     'crispy_bootstrap5',
+    'users'
 
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
-CRISPY_ALLOWED_TEMPLATE_PACKS = ('bootstrap5',)
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -139,13 +140,23 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Настройки для работы с электронной почтой.
-# Обратите внимание, что вы должны использовать свой логин, пароль и адрес электронной почты Яндекса.
-# Теперь, когда статья достигнет 100 просмотров, вы получите письмо на указанный вами адрес электронной почты.
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'ваш_логин@yandex.ru'
-EMAIL_HOST_PASSWORD = 'ваш_пароль'
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = 465
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_SSL = True
+SERVER_EMAIL = EMAIL_HOST_USER
+
+DEFAULT_FROM_EMAIL = SERVER_EMAIL
+
+AUTH_USER_MODEL = 'users.User'
+LOGIN_REDIRECT_URL = '/home'
+LOGOUT_REDIRECT_URL = '/home'
+
+LOGIN_URL = '/users/'
+
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]

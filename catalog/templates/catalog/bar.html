@@ -4,4 +4,12 @@
     <a class="p-2 btn btn-outline-primary me-2" href="{% url 'catalog:create_product' %}">Создать продукт</a>
     <a class="p-2 btn btn-outline-primary me-2" href="{% url 'blogpost:blogpost_list' %}">Блог</a>
     <a class="p-2 btn btn-outline-primary me-2" href="{% url 'catalog:category' %}">Категории</a>
+
+    {% if user.is_authenticated %}
+        <a class="p-2 btn btn-outline-primary me-2" href="{% url 'users:user_profile' %}">Мой профиль</a>
+        <a class="p-2 btn btn-outline-danger me-2" href="{% url 'users:logout' %}">Выход</a>
+    {% else %}
+        <a class="p-2 btn btn-outline-primary me-2" href="{% url 'users:login' %}">Вход</a>
+        <a class="p-2 btn btn-outline-success" href="{% url 'users:register' %}">Регистрация</a>
+    {% endif %}
 </div>
