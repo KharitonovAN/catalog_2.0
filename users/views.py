@@ -28,7 +28,7 @@ class RegisterView(CreateView):
     template_name = 'users/register.html'
     success_url = reverse_lazy('users:confirm_register')
 
-    def form_valid(self, form):
+    def form_valid(self, form, *args, **kwargs):
         new_user = form.save()
         new_user.user_token = token_generator.make_token(new_user)
         form.save()
@@ -47,11 +47,11 @@ class RegisterView(CreateView):
 class ConfirmUserView(View):
     def get(self, request, uuid):
         try:
-            user = User.objects.get(field_uuid=uuid)
-            user.is_active = True
-            user.has_perm('catalog.view_product')
-            user.has_perm('blog.view_product')
-            user.save()
+            new_user = User.objects.get(field_uuid=uuid)
+            new_user.is_active = True
+            new_user.has_perm('catalog.view_product')
+            new_user.has_perm('blog.view_product')
+            new_user.save()
             return render(request, 'users/confirm_register.html')
         except User.DoesNotExist:
             return render(request, 'users/error_register.html')
@@ -79,4 +79,4 @@ class UserPasswordResetConfirmView(PasswordResetConfirmView):
     form_class = UserSetNewPasswordForm
     template_name = 'users/user_password_set_new.html'
     success_url = reverse_lazy('users:login')
-    success_message = 'Пароль успешно изменен. Можете авторизоваться на сайте.'
+    success_message = 'Пароль успешно изменен.'
