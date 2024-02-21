@@ -40,10 +40,9 @@ INSTALLED_APPS = [
 
     'catalog',
     'blogpost',
-    'users'
-
     'crispy_forms',
     'crispy_bootstrap5',
+    'users'
 
 ]
 
