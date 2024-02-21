@@ -40,9 +40,10 @@ INSTALLED_APPS = [
 
     'catalog',
     'blogpost',
+    'users'
+
     'crispy_forms',
     'crispy_bootstrap5',
-    'users'
 
 ]
 
@@ -138,20 +139,20 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'adm1n.django@ya.ru'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = 'adm1n.django@ya.ru'
-EMAIL_HOST_PASSWORD = 'admin82han'
+EMAIL_HOST_PASSWORD = 'qsbtnmvyrutcaeof'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 SERVER_EMAIL = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = SERVER_EMAIL
 
 AUTH_USER_MODEL = 'users.User'
-LOGIN_REDIRECT_URL = '/home'
-LOGOUT_REDIRECT_URL = '/home'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/users/'
 
 AUTHENTICATION_BACKENDS = [

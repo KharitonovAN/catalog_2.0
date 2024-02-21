@@ -1,11 +1,9 @@
-from django.contrib.auth.tokens import default_token_generator as token_generator
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as BaseLoginView, PasswordResetView, PasswordResetConfirmView
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-from users.utils import register_confirm
+from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import CreateView, UpdateView
 from config import settings
@@ -25,21 +23,20 @@ def logout_user(request):
 class RegisterView(CreateView):
     model = User
     form_class = RegisterForm
+    success_url = reverse_lazy('catalog:home')
     template_name = 'users/register.html'
-    success_url = reverse_lazy('users:confirm_register')
 
-    def form_valid(self, form, *args, **kwargs):
-        new_user = form.save()
-        new_user.user_token = token_generator.make_token(new_user)
-        form.save()
-        register_confirm_ = register_confirm(self.request, user=new_user)
+    def form_valid(self, form):
         if form.is_valid():
-            new_user = form.save()
+            user = form.save()
+            domain = 'http://127.0.0.1:8000/'
+
             send_mail(
-                subject='Подтверждение почты',
-                message=register_confirm_['message'],
+                subject=f'Подтверждение регистрации для {user.email}',
+                message=f"""Вы зарегистрировались. Необходимо подтвердить Ваш аккаунт по ссылке \n
+                {domain}{reverse('users:confirm_register', kwargs={'uuid':user.field_uuid})}""",
                 from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[new_user.email]
+                recipient_list=[user.email]
             )
         return super().form_valid(form)
 
@@ -47,11 +44,11 @@ class RegisterView(CreateView):
 class ConfirmUserView(View):
     def get(self, request, uuid):
         try:
-            new_user = User.objects.get(field_uuid=uuid)
-            new_user.is_active = True
-            new_user.has_perm('catalog.view_product')
-            new_user.has_perm('blog.view_product')
-            new_user.save()
+            user = User.objects.get(field_uuid=uuid)
+            user.is_active = True
+            user.has_perm('catalog.view_product')
+            user.has_perm('blog.view_product')
+            user.save()
             return render(request, 'users/confirm_register.html')
         except User.DoesNotExist:
             return render(request, 'users/error_register.html')
@@ -70,7 +67,7 @@ class UserForgotPasswordView(PasswordResetView):
     form_class = UserForgotPasswordForm
     template_name = 'users/user_password_reset.html'
     success_url = reverse_lazy('catalog:home')
-    success_message = 'Письмо с инструкцией по восстановлению пароля отправлена на ваш email'
+    success_message = 'Письмо для восстановления пароля отправлено на ваш email'
     subject_template_name = 'users/password_subject_reset_mail.txt'
     email_template_name = 'users/password_reset_mail.html'
 
@@ -79,4 +76,4 @@ class UserPasswordResetConfirmView(PasswordResetConfirmView):
     form_class = UserSetNewPasswordForm
     template_name = 'users/user_password_set_new.html'
     success_url = reverse_lazy('users:login')
-    success_message = 'Пароль успешно изменен.'
+    success_message = 'Пароль успешно изменен. Можете авторизоваться на сайте.'

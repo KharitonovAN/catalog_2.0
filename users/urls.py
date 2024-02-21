@@ -13,6 +13,7 @@ from users.views import (
 app_name = UsersConfig.name
 
 urlpatterns = [
+
     path('', LoginView.as_view(), name='login'),
     path('logout/', logout_user, name='logout'),
     path('register/', RegisterView.as_view(), name='register'),
@@ -20,4 +21,5 @@ urlpatterns = [
     path('user_pfofile/', UserProfileView.as_view(), name='user_profile'),
     path('password-reset/', UserForgotPasswordView.as_view(), name='password_reset'),
     path('set-new-password/<uidb64>/<token>/', UserPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+
 ]

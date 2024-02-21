@@ -6,7 +6,6 @@ NULLABLE = {'null': True, 'blank': True}
 
 
 class User(AbstractUser):
-
     class Country(models.TextChoices):
         RUSSIA = 'RUS', 'Россия'
         ARMENIA = 'ARM', 'Армения'
@@ -21,10 +20,6 @@ class User(AbstractUser):
     country = models.CharField(choices=Country.choices, verbose_name='Страна', default=Country.RUSSIA)
     field_uuid = models.UUIDField(unique=True, default=uuid.uuid4(), verbose_name='UUID')
 
-    is_active = models.BooleanField(default=False, verbose_name='Признак активности')
-    is_staff = models.BooleanField(default=False, verbose_name='Признак принадлежности к админу')
-    is_superuser = models.BooleanField(default=False, verbose_name='Признак суперпользователя')
-
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
@@ -32,6 +27,5 @@ class User(AbstractUser):
         return f"{self.email}/{self.is_active}"
 
     class Meta:
-
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
