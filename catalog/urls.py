@@ -10,6 +10,8 @@ from .views import (
     ProductListView,
     EditProductView,
     ProductDeleteView,
+    PersonalAreaView,
+    ModeratorProductsView,
 )
 
 
@@ -22,9 +24,11 @@ urlpatterns = [
     path('category/', CategoryListView.as_view(), name='category'),
     path('<int:pk>/products/', ProductListView.as_view(), name='product_list'),
     path('<int:pk>/product_detail/', ProductDetailView.as_view(), name='product_detail'),
-    path('save_product/', CreateProductView.as_view(), name='create_product'),
     path('<int:pk>/edit_product/', EditProductView.as_view(), name='edit_product'),
     path('<int:pk>/delete/', ProductDeleteView.as_view(), name='product_confirm_delete'),
+    path('personal_area/', PersonalAreaView.as_view(), name='personal_area'),
+    path('personal_area/all_products', ModeratorProductsView.as_view(), name='moderator_products_list'),
+    path('personal_area/save_product/', CreateProductView.as_view(), name='create_product'),
 
 ]
 

@@ -43,3 +43,9 @@ class VersionForm(forms.ModelForm, CrispyFormMixin):
     class Meta:
         model = Version
         fields = '__all__'
+
+
+class ModeratorProductForm(CrispyFormMixin, forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ('name', 'category', 'image', 'price', 'description', 'is_published')

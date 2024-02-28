@@ -1,7 +1,8 @@
 from django.forms import inlineformset_factory
 from django.urls import reverse, reverse_lazy
-from .forms import ProductForm, VersionForm
-from .models import Product, Version, Category
+from catalog.forms import ProductForm, VersionForm, ModeratorProductForm
+from catalog.models import Product, Version, Category
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import (
     CreateView,
     UpdateView,
@@ -17,7 +18,7 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data['object_list'] = Product.objects.all().order_by('?')[:2]
+        context_data['object_list'] = Product.objects.filter(is_published=True).order_by('?')[:2]
         return context_data
 
 
@@ -38,22 +39,37 @@ class CategoryListView(ListView):
     model = Category
 
 
-class ProductListView(ListView):
+class ProductListView(LoginRequiredMixin, ListView):
     model = Product
 
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(category_id=self.kwargs.get('pk'))
+        queryset = queryset.filter(is_published=True)
         return queryset
 
 
-class ProductDetailView(DetailView):
+class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
 
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        data = context_data['object']
+        active_version = data.prod_name.filter(is_active=True)
+        if active_version:
+            for item in active_version:
+                data.version_number = item.version_number
+                data.version_name = item.version_name
+                context_data['version'] = f'{data.version_number} / {data.version_name}'
+        else:
+            context_data['version'] = ''
+        return context_data
 
-class CreateProductView(CreateView):
+
+class CreateProductView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Product
-    form_class = ProductForm
+    permission_required = 'catalog.add_product'
+    permission_denied_message = 'Access is denied!'
 
     def get_success_url(self):
         return reverse('catalog:product_detail', args=[self.object.pk])
@@ -79,10 +95,17 @@ class CreateProductView(CreateView):
             formset.save()
         return super().form_valid(form)
 
+    def get_form_class(self):
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return ModeratorProductForm
+        return ProductForm
 
-class EditProductView(UpdateView):
+
+class EditProductView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
+    permission_required = 'catalog.change_product'
+    permission_denied_message = 'Access is denied!'
 
     def get_success_url(self):
         pk = self.kwargs['pk']
@@ -100,10 +123,48 @@ class EditProductView(UpdateView):
     def form_valid(self, form):
         formset = self.get_context_data()['formset']
         self.object = form.save()
+        if self.object.user_create == self.request.user:
+            self.object.user_create = self.request.user
         if formset.is_valid():
             formset.instance = self.object
             formset.save()
         return super().form_valid(form)
+
+    def get_object(self, *args, **kwargs):
+        product = super().get_object(*args, **kwargs)
+        if product.user_create == self.request.user or self.request.user.is_superuser or self.request.user.is_staff:
+            return product
+        return reverse('catalog:products')
+
+    def get_form_class(self):
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return ModeratorProductForm
+        return ProductForm
+
+
+class PersonalAreaView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    template_name = 'catalog/personal_area.html'
+    permission_required = [
+        'catalog.add_product',
+        'catalog.change_product']
+    permission_denied_message = 'Доступ запрещен.'
+
+
+class ModeratorProductsView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = Product
+    permission_required = [
+        'catalog.add_product',
+        'catalog.change_product']
+    permission_denied_message = 'Доступ запрещен.'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return queryset.all()
+
+        products = Product.objects.filter(user_create=self.request.user)
+        queryset = products
+        return queryset
 
 
 class ProductDeleteView(DeleteView):
