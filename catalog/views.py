@@ -3,6 +3,8 @@ from django.urls import reverse, reverse_lazy
 from catalog.forms import ProductForm, VersionForm, ModeratorProductForm
 from catalog.models import Product, Version, Category
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from catalog.services import get_category_cache
+from config import settings
 from django.views.generic import (
     CreateView,
     UpdateView,
@@ -37,6 +39,14 @@ class ContactsView(TemplateView):
 
 class CategoryListView(ListView):
     model = Category
+
+    def get_context_data(self, *args, **kwargs):
+        context_data = super().get_context_data(*args, **kwargs)
+        if settings.CASH_ALLOWED:
+            context_data['category_list'] = get_category_cache()
+        else:
+            context_data['category_list'] = Category.objects.all()
+        return context_data
 
 
 class ProductListView(LoginRequiredMixin, ListView):

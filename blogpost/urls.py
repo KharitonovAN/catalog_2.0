@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+from django.views.decorators.cache import never_cache
+
 from .views import (
     BlogPostListView,
     BlogPostDetailView,
@@ -13,7 +15,7 @@ app_name = 'blogpost'
 
 urlpatterns = [
     path('', BlogPostListView.as_view(), name='blogpost_list'),
-    path('create/', BlogPostCreateView.as_view(), name='blogpost_create'),
+    path('create/', never_cache(BlogPostCreateView.as_view()), name='blogpost_create'),
     path('detail/<int:pk>/', BlogPostDetailView.as_view(), name='blogpost_detail'),
     path('edit/<int:pk>/', BlogPostUpdateView.as_view(), name='blogpost_edit'),
     path('delete/<int:pk>/', BlogPostDeleteView.as_view(), name='blogpost_delete'),
