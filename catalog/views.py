@@ -20,7 +20,13 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data['object_list'] = Product.objects.filter(is_published=True).order_by('?')[:2]
+        product_list = Product.objects.filter(is_published=True).order_by('?')[:2]
+
+        if product_list:
+            context_data['object_list'] = product_list
+        else:
+            context_data['object_list'] = []
+
         return context_data
 
 
