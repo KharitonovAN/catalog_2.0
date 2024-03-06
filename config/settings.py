@@ -167,6 +167,6 @@ CASH_ALLOWED = os.getenv('CASH_ALLOWED') is True
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': os.getenv('LOCATION'),
+        'LOCATION': 'redis://localhost:6379',
     }
 }
